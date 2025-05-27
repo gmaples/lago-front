@@ -24,6 +24,18 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const port = env.PORT ? parseInt(env.PORT) : 8080
 
+  // Build allowed hosts dynamically for Gitpod and other environments
+  const allowedHosts = ['app.lago.dev']
+  
+  // Add Gitpod hostname if running in Gitpod environment
+  if (env.GITPOD_WORKSPACE_ID && env.GITPOD_WORKSPACE_CLUSTER_HOST) {
+    const gitpodHost = `8080-${env.GITPOD_WORKSPACE_ID}.${env.GITPOD_WORKSPACE_CLUSTER_HOST}`
+    allowedHosts.push(gitpodHost)
+  }
+  
+  // Also allow any localhost variations
+  allowedHosts.push('localhost', '127.0.0.1', '0.0.0.0')
+
   return {
     plugins: [
       react({
@@ -82,7 +94,7 @@ export default defineConfig(({ mode }) => {
       port,
       host: true,
       strictPort: true,
-      allowedHosts: ['app.lago.dev'],
+      allowedHosts: allowedHosts,
     },
     preview: {
       port,
